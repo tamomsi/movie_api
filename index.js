@@ -36,7 +36,7 @@ app.get('/', (req, res) => {
 });
 
 //return JSON object for movies
-app.get('/Movies', (req, res) => {
+app.get('/Movies', passport.authenticate('jwt', { session: false }), (req, res) => {
   Movies.find()
   .then((movies) => {
     res.status(201).json(movies);
