@@ -5,6 +5,11 @@ const jwt = require('jsonwebtoken'),
 
 require('./passport');  // Your local passport file
 
+/**
+ * Generate a JWT token for the provided user
+ * @param {object} user - The user object to generate the token for
+ * @returns {string} - The generated JWT token
+ */
 let generateJWTToken = (user) => {
   return jwt.sign(user, jwtSecret, {
     subject: user.UserName, // This is the username you’re encoding in the JWT
@@ -13,8 +18,16 @@ let generateJWTToken = (user) => {
   });
 }
 
-//post login
+/**
+ * Authenticate user credentials and generate a JWT token upon successful login
+ * @param {object} router - The Express router object
+ */
 module.exports = (router) => {
+  /**
+   * POST login route
+   * @param {object} req - The Express request object
+   * @param {object} res - The Express response object
+   */
     router.post('/login', (req, res) => {
         passport.authenticate('local',{ session: false }, (error, user, info) => {
                 console.log({error, user})
