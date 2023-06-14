@@ -37,3 +37,4 @@ userSchema.methods.validatePassword = function(password) {
   
   module.exports.Movie = Movie;
   module.exports.User = User;
+  
