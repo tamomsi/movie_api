@@ -30,13 +30,27 @@ let auth = require('./auth')(app);
 const passport = require('passport');
 require('./passport');
 
-
+/**
+ * Route handler for the home page.
+ * @name GET /
+ * @function
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ */
 app.get('/', (req, res) => {
    res.send('Welcome to myFlix!');
 });
 
 //return JSON object for movies
 app.get('/Movies', passport.authenticate('jwt', { session: false }), (req, res) => {
+    /**
+   * Retrieves all movies from the database.
+   * @name GET /Movies
+   * @inner
+   * @function
+   * @param {Object} req - Express request object.
+   * @param {Object} res - Express response object.
+   */
   Movies.find()
   .then((movies) => {
     res.status(201).json(movies);
@@ -49,6 +63,14 @@ app.get('/Movies', passport.authenticate('jwt', { session: false }), (req, res) 
 
 //get movies by title
 app.get('/movies/:Title', passport.authenticate('jwt', { session: false }), (req, res) => {
+    /**
+   * Retrieves a movie by title from the database.
+   * @name GET /movies/:Title
+   * @inner
+   * @function
+   * @param {Object} req - Express request object.
+   * @param {Object} res - Express response object.
+   */
   Movies.findOne({ Title: req.params.Title })
   .then((movie) => {
     res.json(movie);
@@ -61,6 +83,14 @@ app.get('/movies/:Title', passport.authenticate('jwt', { session: false }), (req
 
 //info about genre by genre name
 app.get('/movies/genre/:genreName', passport.authenticate('jwt', { session: false }), (req,res) => {
+    /**
+   * Retrieves genre information by genre name from the database.
+   * @name GET /movies/genre/:genreName
+   * @inner
+   * @function
+   * @param {Object} req - Express request object.
+   * @param {Object} res - Express response object.
+   */
   Movies.findOne({'Genre.Name':req.params.genreName })
   .then((movie) => {
       res.json(movie.Genre);
@@ -73,6 +103,14 @@ app.get('/movies/genre/:genreName', passport.authenticate('jwt', { session: fals
 
 //info about directors by their name
 app.get('/movies/director/:directorName', passport.authenticate('jwt', { session: false }), (req,res) => {
+  /**
+   * Retrieves director information by director name from the database.
+   * @name GET /movies/director/:directorName
+   * @inner
+   * @function
+   * @param {Object} req - Express request object.
+   * @param {Object} res - Express response object.
+   */
   Movies.findOne({ 'Director.Name': req.params.directorName})
   .then((movie) => {
       res.json(movie.Director);
@@ -85,6 +123,14 @@ app.get('/movies/director/:directorName', passport.authenticate('jwt', { session
 
 // Get all users
 app.get('/users', passport.authenticate('jwt', { session: false }), (req, res) => {
+  /**
+   * Retrieves all users from the database.
+   * @name GET /users
+   * @inner
+   * @function
+   * @param {Object} req - Express request object.
+   * @param {Object} res - Express response object.
+   */
   Users.find()
     .then((users) => {
       res.status(201).json(users);
@@ -97,6 +143,14 @@ app.get('/users', passport.authenticate('jwt', { session: false }), (req, res) =
 
 // Get a user by username
 app.get('/users/:UserName', passport.authenticate('jwt', { session: false }), (req, res) => {
+  /**
+   * Retrieves a user by username from the database.
+   * @name GET /users/:UserName
+   * @inner
+   * @function
+   * @param {Object} req - Express request object.
+   * @param {Object} res - Express response object.
+   */
   Users.findOne({ UserName: req.params.UserName })
     .then((user) => {
       res.json(user);
@@ -115,6 +169,14 @@ app.post('/users',
     check('Password', 'Password is required').not().isEmpty(),
     check('email', 'Valid email is required').isEmail()
 ], (req, res) => {
+    /**
+     * Creates a new user in the database.
+     * @name POST /users
+     * @inner
+     * @function
+     * @param {Object} req - Express request object.
+     * @param {Object} res - Express response object.
+     */
     let errors = validationResult(req);
 
     if (!errors.isEmpty()) {
@@ -155,6 +217,14 @@ app.put('/users/:UserName', passport.authenticate('jwt', { session: false }),
         check('Password', 'Password is required').not().isEmpty(),
         check('email', 'Valid email is required').isEmail()
     ], (req, res) => {
+    /**
+     * Updates a user's information in the database by username.
+     * @name PUT /users/:UserName
+     * @inner
+     * @function
+     * @param {Object} req - Express request object.
+     * @param {Object} res - Express response object.
+     */
        let errors = validationResult(req);
 
         if (!errors.isEmpty()) {
@@ -182,6 +252,14 @@ app.put('/users/:UserName', passport.authenticate('jwt', { session: false }),
 
 //add a new movie to favs
 app.post("/users/:UserName/movies/:MovieId", passport.authenticate('jwt', { session: false }), (req, res) => {
+  /**
+   * Adds a movie to a user's list of favorite movies in the database.
+   * @name POST /users/:UserName/movies/:MovieId
+   * @inner
+   * @function
+   * @param {Object} req - Express request object.
+   * @param {Object} res - Express response object.
+   */
   Users.findOneAndUpdate(
     { UserName: req.params.UserName },
     {
@@ -200,6 +278,14 @@ app.post("/users/:UserName/movies/:MovieId", passport.authenticate('jwt', { sess
 
 //remove a movie from their list of favorites
 app.delete('/users/:UserName/movies/:MovieId', passport.authenticate('jwt', { session: false }), (req, res) => {
+   /**
+   * Removes a movie from a user's list of favorite movies in the database.
+   * @name DELETE /users/:UserName/movies/:MovieId
+   * @inner
+   * @function
+   * @param {Object} req - Express request object.
+   * @param {Object} res - Express response object.
+   */
   Users.findOneAndUpdate({ UserName: req.params.UserName }, {
      $pull: { FavoriteMovies: req.params.MovieId }
    },
@@ -216,6 +302,14 @@ app.delete('/users/:UserName/movies/:MovieId', passport.authenticate('jwt', { se
 
 // Delete a user by username
 app.delete('/users/:UserName', passport.authenticate('jwt', { session: false }), (req, res) => {
+  /**
+   * Deletes a user from the database by username.
+   * @name DELETE /users/:UserName
+   * @inner
+   * @function
+   * @param {Object} req - Express request object.
+   * @param {Object} res - Express response object.
+   */
   Users.findOneAndRemove({ UserName: req.params.UserName })
     .then((user) => {
       if (!user) {
@@ -231,6 +325,14 @@ app.delete('/users/:UserName', passport.authenticate('jwt', { session: false }),
 });
       
 app.get('/documentation', (req, res) => {
+  /**
+   * Sends the documentation file.
+   * @name GET /documentation
+   * @inner
+   * @function
+   * @param {Object} req - Express request object.
+   * @param {Object} res - Express response object.
+   */
     res.sendFile('public/documentation.html', { root: __dirname });
 });
 
