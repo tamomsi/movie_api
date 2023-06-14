@@ -43,14 +43,6 @@ app.get('/', (req, res) => {
 
 //return JSON object for movies
 app.get('/Movies', passport.authenticate('jwt', { session: false }), (req, res) => {
-    /**
-   * Retrieves all movies from the database.
-   * @name GET /Movies
-   * @inner
-   * @function
-   * @param {Object} req - Express request object.
-   * @param {Object} res - Express response object.
-   */
   Movies.find()
   .then((movies) => {
     res.status(201).json(movies);
