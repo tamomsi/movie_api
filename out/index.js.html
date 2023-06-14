@@ -1,4 +1,32 @@
-const express = require('express');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: index.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: index.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const express = require('express');
 const morgan = require('morgan');
 const app = express();
 const uuid = require('uuid');
@@ -10,9 +38,16 @@ const Models = require('./models.js');
 const Movies = Models.Movie;
 const Users = Models.User;
 
-//mongoose.connect('mongodb://localhost:27017/cfDB', { useNewUrlParser: true, useUnifiedTopology: true });
+/**
+ * Connect to the MongoDB database
+ * @param {string} process.env.CONNECTION_URI - MongoDB connection URI
+ * @param {object} { useNewUrlParser: true, useUnifiedTopology: true } - Connection options
+ */
 mongoose.connect( process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
+/**
+ * Middleware configuration
+ */
 app.use(bodyParser.json());
 app.use(express.static('public'));
 app.use(morgan('common'));
@@ -31,18 +66,18 @@ const passport = require('passport');
 require('./passport');
 
 /**
- * Route handler for the home page.
- * @name GET /
- * @function
- * @param {Object} req - Express request object.
- * @param {Object} res - Express response object.
+ * Default route
  */
 app.get('/', (req, res) => {
    res.send('Welcome to myFlix!');
 });
 
-//return JSON object for movies
-app.get('/Movies', passport.authenticate('jwt', { session: false }), (req, res) => {
+app.get('/Movies', (req, res) => {
+  /**
+   * Retrieve all movies from the database
+   * @returns {object} - All movies in the database
+   * @throws {error} - Error if there's an issue retrieving the movies
+   */
   Movies.find()
   .then((movies) => {
     res.status(201).json(movies);
@@ -53,15 +88,12 @@ app.get('/Movies', passport.authenticate('jwt', { session: false }), (req, res) 
   });
 });
 
-//get movies by title
 app.get('/movies/:Title', passport.authenticate('jwt', { session: false }), (req, res) => {
-    /**
-   * Retrieves a movie by title from the database.
-   * @name GET /movies/:Title
-   * @inner
-   * @function
-   * @param {Object} req - Express request object.
-   * @param {Object} res - Express response object.
+  /**
+   * Retrieve a movie by its title
+   * @param {string} req.params.Title - The title of the movie to retrieve
+   * @returns {object} - The movie with the specified title
+   * @throws {error} - Error if there's an issue retrieving the movie
    */
   Movies.findOne({ Title: req.params.Title })
   .then((movie) => {
@@ -73,15 +105,12 @@ app.get('/movies/:Title', passport.authenticate('jwt', { session: false }), (req
   });
 });
 
-//info about genre by genre name
 app.get('/movies/genre/:genreName', passport.authenticate('jwt', { session: false }), (req,res) => {
-    /**
-   * Retrieves genre information by genre name from the database.
-   * @name GET /movies/genre/:genreName
-   * @inner
-   * @function
-   * @param {Object} req - Express request object.
-   * @param {Object} res - Express response object.
+  /**
+   * Retrieve genre information by genre name
+   * @param {string} req.params.genreName - The name of the genre
+   * @returns {object} - The genre information for the specified genre name
+   * @throws {error} - Error if there's an issue retrieving the genre information
    */
   Movies.findOne({'Genre.Name':req.params.genreName })
   .then((movie) => {
@@ -93,15 +122,12 @@ app.get('/movies/genre/:genreName', passport.authenticate('jwt', { session: fals
   });
 });
 
-//info about directors by their name
 app.get('/movies/director/:directorName', passport.authenticate('jwt', { session: false }), (req,res) => {
   /**
-   * Retrieves director information by director name from the database.
-   * @name GET /movies/director/:directorName
-   * @inner
-   * @function
-   * @param {Object} req - Express request object.
-   * @param {Object} res - Express response object.
+   * Retrieve director information by director name
+   * @param {string} req.params.directorName - The name of the director
+   * @returns {object} - The director information for the specified director name
+   * @throws {error} - Error if there's an issue retrieving the director information
    */
   Movies.findOne({ 'Director.Name': req.params.directorName})
   .then((movie) => {
@@ -113,15 +139,11 @@ app.get('/movies/director/:directorName', passport.authenticate('jwt', { session
   });
 });
 
-// Get all users
 app.get('/users', passport.authenticate('jwt', { session: false }), (req, res) => {
   /**
-   * Retrieves all users from the database.
-   * @name GET /users
-   * @inner
-   * @function
-   * @param {Object} req - Express request object.
-   * @param {Object} res - Express response object.
+   * Retrieve all users
+   * @returns {object} - All users in the database
+   * @throws {error} - Error if there's an issue retrieving the users
    */
   Users.find()
     .then((users) => {
@@ -133,15 +155,12 @@ app.get('/users', passport.authenticate('jwt', { session: false }), (req, res) =
     });
 });
 
-// Get a user by username
 app.get('/users/:UserName', passport.authenticate('jwt', { session: false }), (req, res) => {
   /**
-   * Retrieves a user by username from the database.
-   * @name GET /users/:UserName
-   * @inner
-   * @function
-   * @param {Object} req - Express request object.
-   * @param {Object} res - Express response object.
+   * Retrieve a user by username
+   * @param {string} req.params.UserName - The username of the user to retrieve
+   * @returns {object} - The user with the specified username
+   * @throws {error} - Error if there's an issue retrieving the user
    */
   Users.findOne({ UserName: req.params.UserName })
     .then((user) => {
@@ -153,7 +172,6 @@ app.get('/users/:UserName', passport.authenticate('jwt', { session: false }), (r
     });
 });
 
-//add a new user
 app.post('/users', 
 [
     check('UserName', 'UserName is required').isLength({min: 5}),
@@ -161,20 +179,21 @@ app.post('/users',
     check('Password', 'Password is required').not().isEmpty(),
     check('email', 'Valid email is required').isEmail()
 ], (req, res) => {
-    /**
-     * Creates a new user in the database.
-     * @name POST /users
-     * @inner
-     * @function
-     * @param {Object} req - Express request object.
-     * @param {Object} res - Express response object.
-     */
     let errors = validationResult(req);
 
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
     }
 
+  /**
+   * Create a new user
+   * @param {string} req.body.UserName - The username of the new user
+   * @param {string} req.body.Password - The password of the new user
+   * @param {string} req.body.email - The email of the new user
+   * @param {string} req.body.Birthday - The birthday of the new user
+   * @returns {object} - The created user
+   * @throws {error} - Error if there's an issue creating the user
+   */
  let hashedPassword = Users.hashPassword(req.body.Password);
   Users.findOne({ UserName: req.body.UserName })
     .then((user) => {
@@ -201,7 +220,6 @@ app.post('/users',
     });
 });
 
-// Update a user's info, by username
 app.put('/users/:UserName', passport.authenticate('jwt', { session: false }),
 [
         check('UserName', 'UserName is required').isLength({ min: 5 }),
@@ -209,20 +227,22 @@ app.put('/users/:UserName', passport.authenticate('jwt', { session: false }),
         check('Password', 'Password is required').not().isEmpty(),
         check('email', 'Valid email is required').isEmail()
     ], (req, res) => {
-    /**
-     * Updates a user's information in the database by username.
-     * @name PUT /users/:UserName
-     * @inner
-     * @function
-     * @param {Object} req - Express request object.
-     * @param {Object} res - Express response object.
-     */
        let errors = validationResult(req);
 
         if (!errors.isEmpty()) {
             return res.status(422).json({ errors: errors.array() });
         }
-
+       
+      /**
+       * Update user information by username
+       * @param {string} req.params.UserName - The username of the user to update
+       * @param {string} req.body.UserName - The new username of the user
+       * @param {string} req.body.Password - The new password of the user
+       * @param {string} req.body.email - The new email of the user
+       * @param {string} req.body.Birthday - The new birthday of the user
+       * @returns {object} - The updated user
+       * @throws {error} - Error if there's an issue updating the user
+       */ 
       let hashedPassword = Users.hashPassword(req.body.Password);
       Users.findOneAndUpdate({ UserName: req.params.UserName }, { $set:
     {
@@ -242,15 +262,13 @@ app.put('/users/:UserName', passport.authenticate('jwt', { session: false }),
   });
 });
 
-//add a new movie to favs
 app.post("/users/:UserName/movies/:MovieId", passport.authenticate('jwt', { session: false }), (req, res) => {
   /**
-   * Adds a movie to a user's list of favorite movies in the database.
-   * @name POST /users/:UserName/movies/:MovieId
-   * @inner
-   * @function
-   * @param {Object} req - Express request object.
-   * @param {Object} res - Express response object.
+   * Add a movie to a user's favorites
+   * @param {string} req.params.UserName - The username of the user
+   * @param {string} req.params.MovieId - The ID of the movie to add to favorites
+   * @returns {object} - The updated user with the added movie in favorites
+   * @throws {error} - Error if there's an issue adding the movie to favorites
    */
   Users.findOneAndUpdate(
     { UserName: req.params.UserName },
@@ -268,15 +286,13 @@ app.post("/users/:UserName/movies/:MovieId", passport.authenticate('jwt', { sess
     });
 });
 
-//remove a movie from their list of favorites
 app.delete('/users/:UserName/movies/:MovieId', passport.authenticate('jwt', { session: false }), (req, res) => {
-   /**
-   * Removes a movie from a user's list of favorite movies in the database.
-   * @name DELETE /users/:UserName/movies/:MovieId
-   * @inner
-   * @function
-   * @param {Object} req - Express request object.
-   * @param {Object} res - Express response object.
+  /**
+   * Remove a movie from a user's favorites
+   * @param {string} req.params.UserName - The username of the user
+   * @param {string} req.params.MovieId - The ID of the movie to remove from favorites
+   * @returns {object} - The updated user with the removed movie from favorites
+   * @throws {error} - Error if there's an issue removing the movie from favorites
    */
   Users.findOneAndUpdate({ UserName: req.params.UserName }, {
      $pull: { FavoriteMovies: req.params.MovieId }
@@ -292,15 +308,12 @@ app.delete('/users/:UserName/movies/:MovieId', passport.authenticate('jwt', { se
     });
 });
 
-// Delete a user by username
 app.delete('/users/:UserName', passport.authenticate('jwt', { session: false }), (req, res) => {
   /**
-   * Deletes a user from the database by username.
-   * @name DELETE /users/:UserName
-   * @inner
-   * @function
-   * @param {Object} req - Express request object.
-   * @param {Object} res - Express response object.
+   * Delete a user by username
+   * @param {string} req.params.UserName - The username of the user to delete
+   * @returns {string} - A success message indicating the deletion of the user
+   * @throws {error} - Error if there's an issue deleting the user
    */
   Users.findOneAndRemove({ UserName: req.params.UserName })
     .then((user) => {
@@ -315,25 +328,51 @@ app.delete('/users/:UserName', passport.authenticate('jwt', { session: false }),
       res.status(500).send('Error: ' + err);
     });
 });
-      
+
+/**
+ * Documentation route
+ */
 app.get('/documentation', (req, res) => {
-  /**
-   * Sends the documentation file.
-   * @name GET /documentation
-   * @inner
-   * @function
-   * @param {Object} req - Express request object.
-   * @param {Object} res - Express response object.
-   */
+    /**
+     * Serve the documentation HTML file
+     */
     res.sendFile('public/documentation.html', { root: __dirname });
 });
 
+/**
+ * Error handling middleware
+ */
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send('Oops, something broke! Please try again later.');
 });
 
+/**
+ * Start the server
+ */
 const port = process.env.PORT || 8080;
 app.listen(port, '0.0.0.0',() => {
  console.log('Listening on Port ' + port);
-});
+});</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#generateJWTToken">generateJWTToken</a></li><li><a href="global.html#port">port</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Wed Jun 14 2023 22:37:19 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
