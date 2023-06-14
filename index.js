@@ -50,6 +50,7 @@ app.get('/Movies', (req, res) => {
    * @returns {object} - All movies in the database
    * @throws {error} - Error if there's an issue retrieving the movies
    */
+  app.get('/Movies', passport.authenticate('jwt', { session: false }), (req, res) => {
   Movies.find()
   .then((movies) => {
     res.status(201).json(movies);
